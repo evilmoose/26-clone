@@ -283,7 +283,8 @@ def messages_destroy(message_id):
 ##############################################################################
 # Homepage and error pages
 
-
+@app.route('/')
+def homepage():
 
     if g.user:
         # Fetching the IDs of users that the logged-in user is following
@@ -302,3 +303,13 @@ def messages_destroy(message_id):
 
     else:
         return render_template('home-anon.html')
+    
+@app.after_request
+def add_header(req):
+    """Add non-caching headers on every request."""
+
+    req.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    req.headers["Pragma"] = "no-cache"
+    req.headers["Expires"] = "0"
+    req.headers['Cache-Control'] = 'public, max-age=0'
+    return req
