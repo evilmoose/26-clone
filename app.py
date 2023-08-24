@@ -321,3 +321,31 @@ def add_header(req):
     req.headers["Expires"] = "0"
     req.headers['Cache-Control'] = 'public, max-age=0'
     return req
+
+@app.route('/users/profile', methods=["GET", "POST"])
+def edit_profile():
+    """Edit user profile."""
+
+    # Ensure user is logged in
+    if not g.user:
+        flash("Access unauthorized.", "danger")
+        return redirect("/")
+
+    form = EditUserForm(obj=g.user)
+
+    if form.validate_on_submit():
+        # Check if entered password is correct
+        if User.authenticate(g.user.username, form.password.data):
+            g.user.username = form.username.data
+            g.user.email = form.email.data
+            g.user.image_url = form.image_url.data or "/static/images/default-pic.png"
+            g.user.header_image_url = form.header_image_url.data
+            g.user.bio = form.bio.data
+
+            db.session.commit()
+
+            return redirect(f"/users/{g.user.id}")
+        
+        flash("Incorrect password, please try again.", "danger")
+
+    return render_template('users/edit.html', form=form, user_id=g.user.id)
