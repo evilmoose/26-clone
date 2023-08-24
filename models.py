@@ -208,3 +208,9 @@ def connect_db(app):
 
     db.app = app
     db.init_app(app)
+
+# Association table for Likes
+likes = db.Table('likes',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('message_id', db.Integer, db.ForeignKey('messages.id'), primary_key=True)
+)
